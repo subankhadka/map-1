@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Route from Mukti Chowk to Mahananda Chowk</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  
+  <style>
+    #map {
+      height: 600px;
+      width: 100%;
+    }
+    #distance {
+      font-size: 16px;
+      padding: 8px;
+      background: white;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<div id="distance">Distance: calculating...</div>
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Coordinates for Mukti Chowk and Mahananda Chowk and points in between (approximate)
+  // These coordinates are based on the visible map roads from your image
+  const routeCoords = [
+    [26.6458, 87.9890],  // Mukti Chowk (approximate)
+    [26.6480, 87.9890],
+    [26.6503, 87.9891],
+    [26.6525, 87.9894],
+    [26.6550, 87.9896],
+    [26.6572, 87.9899],  // Mahananda Chowk (approximate)
+  ];
+
+  // Initialize map
+  const map = L.map('map').setView(routeCoords[2], 15);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Add polyline for the route
+  const routeLine = L.polyline(routeCoords, {color: 'blue', weight: 5}).addTo(map);
+
+  // Fit map bounds to the route
+  map.fitBounds(routeLine.getBounds());
+
+  // Calculate total distance in km using Leaflet's distance function
+  function calculateTotalDistance(coords) {
+    let totalDistance = 0;
+    for (let i = 1; i < coords.length; i++) {
+      totalDistance += map.distance(coords[i - 1], coords[i]);
+    }
+    return (totalDistance / 1000).toFixed(2);  // in kilometers, 2 decimals
+  }
+
+  const distanceKm = calculateTotalDistance(routeCoords);
+  document.getElementById('distance').innerText = `Distance: ${distanceKm} km`;
+
+  // Add markers at start and end points
+  L.marker(routeCoords[0]).addTo(map).bindPopup('Mukti Chowk').openPopup();
+  L.marker(routeCoords[routeCoords.length - 1]).addTo(map).bindPopup('Mahananda Chowk');
+</script>
+
+</body>
+</html>
